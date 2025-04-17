@@ -1,0 +1,14 @@
+- name: Verificar versão do MariaDB
+  hosts: all
+  gather_facts: no
+  become: true  # Se precisar de privilégio de root para rodar o comando
+
+  tasks:
+    - name: Verificar versão do MariaDB
+      shell: mysql -V
+      register: mariadb_version
+      ignore_errors: yes
+
+    - name: Exibir versão do MariaDB
+      debug:
+        msg: "Servidor {{ inventory_hostname }} está usando MariaDB: {{ mariadb_version.stdout }}"
