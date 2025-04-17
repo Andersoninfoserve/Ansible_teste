@@ -1,0 +1,13 @@
+- name: Verificar versão do Linux
+  hosts: all
+  gather_facts: no
+  become: false
+
+  tasks:
+    - name: Obter versão do Linux
+      shell: cat /etc/os-release
+      register: linux_info
+
+    - name: Exibir versão do Linux
+      debug:
+        msg: "Servidor {{ inventory_hostname }} está rodando: {{ linux_info.stdout_lines }}"
