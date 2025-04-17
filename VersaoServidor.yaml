@@ -4,10 +4,10 @@
   become: false
 
   tasks:
-    - name: Obter versão do Linux
-      shell: cat /etc/os-release
-      register: linux_info
+    - name: Obter versão do Linux (linha PRETTY_NAME)
+      shell: awk -F= '/^PRETTY_NAME/ {gsub(/"/, "", $2); print $2}' /etc/os-release
+      register: linux_pretty_name
 
-    - name: Exibir versão do Linux
+    - name: Exibir nome e versão do Linux
       debug:
-        msg: "Servidor {{ inventory_hostname }} está rodando: {{ linux_info.stdout_lines }}"
+        msg: "Servidor {{ inventory_hostname }} está rodando: {{ linux_pretty_name.stdout }}"
