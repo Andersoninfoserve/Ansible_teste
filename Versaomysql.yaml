@@ -1,7 +1,6 @@
 - name: Verificar versão do MariaDB
   hosts: all
   gather_facts: no
-  become: true
 
   tasks:
     - name: Verificar versão do MariaDB
