@@ -1,7 +1,7 @@
 - name: Verificar versão do MariaDB
   hosts: all
   gather_facts: no
-  #become: true  # Se precisar de privilégio de root para rodar o comando
+  become: true
 
   tasks:
     - name: Verificar versão do MariaDB
@@ -12,3 +12,4 @@
     - name: Exibir versão do MariaDB
       debug:
         msg: "Servidor {{ inventory_hostname }} está usando MariaDB: {{ mariadb_version.stdout }}"
+      when: mariadb_version is defined and mariadb_version.stdout is defined
