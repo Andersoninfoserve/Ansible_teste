@@ -22,7 +22,7 @@
       ignore_errors: yes
 
     - name: Verificar uso de memória
-      shell: ". /etc/profile && free -h"
+      shell: ". /etc/profile && grep MemTotal /proc/meminfo | awk '{print $2 \" \" $3}'"
       register: mem_usage
       ignore_errors: yes
 
