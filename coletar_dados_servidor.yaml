@@ -1,7 +1,7 @@
 ---
 - name: Coletar dados do servidor
   hosts: all
-  gather_facts: yes
+  gather_facts: no
   become: yes
 
   tasks:
@@ -11,36 +11,44 @@
       register: mysql_version
       ignore_errors: yes
 
-    - name: Obter espaço em disco
+    - name: Obter espaço em disco (/)
       shell: df -h /
       register: disk_space
+      ignore_errors: yes
 
     - name: Obter uso de memória
       shell: free -h
       register: memory_info
+      ignore_errors: yes
 
     - name: Obter uptime do servidor
       shell: uptime -p
       register: uptime_info
+      ignore_errors: yes
 
     - name: Obter IP do servidor
       shell: hostname -I | awk '{print $1}'
       register: ip_address
+      ignore_errors: yes
 
     - name: Obter número de usuários conectados
       shell: who | wc -l
       register: user_count
+      ignore_errors: yes
 
     - name: Exibir informações coletadas
       debug:
         msg: |
           ======= DADOS DO SERVIDOR =======
-          Versão do MySQL: {{ mysql_version.stdout | default('Erro ao obter') }}
+          Versão do MySQL: {{ mysql_version.stdout | default('Não encontrado') }}
           Espaço em disco (/): 
-          {{ disk_space.stdout }}
+          {{ disk_space.stdout | default('Não encontrado') }}
+
           Memória:
-          {{ memory_info.stdout }}
+          {{ memory_info.stdout | default('Não encontrado') }}
+
           Uptime:
-          {{ uptime_info.stdout }}
-          IP do servidor: {{ ip_address.stdout }}
-          Usuários conectados: {{ user_count.stdout }}
+          {{ uptime_info.stdout | default('Não encontrado') }}
+
+          IP do servidor: {{ ip_address.stdout | default('Não encontrado') }}
+          Usuários conectados: {{ user_count.stdout | default('Não encontrado') }}
