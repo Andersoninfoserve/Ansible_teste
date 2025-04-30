@@ -1,47 +1,68 @@
-- name: Coletar dados do servidor com shell interativo
+---
+- name: Coletar dados completos do servidor
   hosts: all
   gather_facts: no
   become: yes
 
   tasks:
 
-    - name: Versão do MariaDB
+    - name: Verificar versão do Linux
+      shell: ". /etc/profile && cat /etc/os-release"
+      register: linux_version
+      ignore_errors: yes
+
+    - name: Verificar versão do MariaDB
       shell: ". /etc/profile && mysql -V"
       register: mysql_version
       ignore_errors: yes
 
-    - name: Espaço em disco
-      shell: ". /etc/profile && df -h /"
+    - name: Verificar espaço em disco de todas as partições
+      shell: ". /etc/profile && df -h --output=source,fstype,size,used,avail,pcent,target"
       register: disk_usage
       ignore_errors: yes
 
-    - name: Uso de memória
+    - name: Verificar uso de memória
       shell: ". /etc/profile && free -h"
       register: mem_usage
       ignore_errors: yes
 
-    - name: Uptime
+    - name: Verificar uptime
       shell: ". /etc/profile && uptime -p"
       register: uptime_info
       ignore_errors: yes
 
-    - name: IP do servidor
+    - name: Verificar IP do servidor
       shell: ". /etc/profile && hostname -I | awk '{print $1}'"
       register: ip_info
       ignore_errors: yes
 
-    - name: Usuários conectados
+    - name: Verificar usuários conectados
       shell: ". /etc/profile && who | wc -l"
       register: user_count
       ignore_errors: yes
 
-    - name: Exibir resultado final
+    - name: Exibir dados organizados do servidor
       debug:
         msg: |
-          ======= DADOS DO SERVIDOR {{ inventory_hostname }} =======
-          MySQL: {{ mysql_version.stdout | default('N/A') }}
-          Espaço em disco: {{ disk_usage.stdout | default('N/A') }}
-          Memória: {{ mem_usage.stdout | default('N/A') }}
-          Uptime: {{ uptime_info.stdout | default('N/A') }}
-          IP: {{ ip_info.stdout | default('N/A') }}
-          Usuários conectados: {{ user_count.stdout | default('N/A') }}
+          ======= DADOS DO SERVIDOR: {{ inventory_hostname }} =======
+
+          🐧 Distribuição Linux:
+          {{ linux_version.stdout | default('Não encontrado') }}
+
+          🛢️ Versão do MariaDB:
+          {{ mysql_version.stdout | default('Não encontrado') }}
+
+          💽 Espaço em disco (todas as partições):
+          {{ disk_usage.stdout | default('Não encontrado') }}
+
+          🧠 Memória:
+          {{ mem_usage.stdout | default('Não encontrado') }}
+
+          ⏱️ Uptime:
+          {{ uptime_info.stdout | default('Não encontrado') }}
+
+          🌐 IP do servidor:
+          {{ ip_info.stdout | default('Não encontrado') }}
+
+          👥 Usuários conectados:
+          {{ user_count.stdout | default('Não encontrado') }}
