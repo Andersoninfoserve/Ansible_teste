@@ -1,46 +1,67 @@
 ---
-- name: Diagnóstico comandos no servidor
+- name: Coletar dados do servidor
   hosts: all
-  become: yes
   gather_facts: no
+  become: yes
 
   tasks:
-    - name: Testar comando mysql -V
-      shell: which mysql && mysql -V
-      register: mysql_test
+
+    - name: Verificar versão do MariaDB
+      shell: mysql -V
+      register: mysql_version
       ignore_errors: yes
 
-    - name: Testar comando df
-      shell: which df && df -h /
-      register: df_test
+    - name: Verificar espaço em disco
+      shell: df -h /
+      register: disk_usage
       ignore_errors: yes
 
-    - name: Testar comando free
-      shell: which free && free -h
-      register: free_test
+    - name: Verificar memória
+      shell: free -h
+      register: mem_usage
       ignore_errors: yes
 
-    - name: Testar comando uptime
-      shell: which uptime && uptime -p
-      register: uptime_test
+    - name: Verificar uptime
+      shell: uptime -p
+      register: uptime_info
       ignore_errors: yes
 
-    - name: Testar comando hostname -I
-      shell: which hostname && hostname -I
-      register: ip_test
+    - name: Verificar IP
+      shell: hostname -I | awk '{print $1}'
+      register: ip_info
       ignore_errors: yes
 
-    - name: Testar comando who
-      shell: which who && who | wc -l
-      register: who_test
+    - name: Verificar usuários conectados
+      shell: who | wc -l
+      register: user_count
       ignore_errors: yes
 
-    - name: Mostrar todos os resultados
+    - name: Mostrar versão do MySQL
       debug:
-        msg: |
-          MYSQL: {{ mysql_test.stdout }}
-          DF: {{ df_test.stdout }}
-          FREE: {{ free_test.stdout }}
-          UPTIME: {{ uptime_test.stdout }}
-          IP: {{ ip_test.stdout }}
-          USERS: {{ who_test.stdout }}
+        msg: "MySQL: {{ mysql_version.stdout }}"
+      when: mysql_version is defined and mysql_version.stdout is defined
+
+    - name: Mostrar espaço em disco
+      debug:
+        msg: "Espaço em disco (/): {{ disk_usage.stdout }}"
+      when: disk_usage is defined and disk_usage.stdout is defined
+
+    - name: Mostrar uso de memória
+      debug:
+        msg: "Memória: {{ mem_usage.stdout }}"
+      when: mem_usage is defined and mem_usage.stdout is defined
+
+    - name: Mostrar uptime
+      debug:
+        msg: "Uptime: {{ uptime_info.stdout }}"
+      when: uptime_info is defined and uptime_info.stdout is defined
+
+    - name: Mostrar IP
+      debug:
+        msg: "IP do servidor: {{ ip_info.stdout }}"
+      when: ip_info is defined and ip_info.stdout is defined
+
+    - name: Mostrar usuários conectados
+      debug:
+        msg: "Usuários conectados: {{ user_count.stdout }}"
+      when: user_count is defined and user_count.stdout is defined
