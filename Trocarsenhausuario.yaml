@@ -1,0 +1,23 @@
+- name: Alterar senha do usuário infoserve
+  hosts: all
+  become: true
+  gather_facts: no
+
+  vars:
+    usuario_alvo: infoserve
+    nova_senha: '@info2016!'
+
+  tasks:
+    - name: Criptografar a nova senha
+      set_fact:
+        senha_criptografada: "{{ nova_senha | password_hash('sha512') }}"
+
+    - name: Alterar a senha do usuário
+      user:
+        name: "{{ usuario_alvo }}"
+        password: "{{ senha_criptografada }}"
+      register: resultado
+
+    - name: Exibir mensagem de sucesso
+      debug:
+        msg: "Senha do usuário {{ usuario_alvo }} foi alterada com sucesso."
