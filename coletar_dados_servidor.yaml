@@ -16,10 +16,14 @@
       register: mysql_version
       ignore_errors: yes
 
-    - name: Verificar espaço em disco de todas as partições
-      shell: ". /etc/profile && df -h --output=source,fstype,size,used,avail,pcent,target"
+    - name: Verificar espaço em disco (sem partições temporárias)
+      shell: |
+        . /etc/profile
+        df -h --output=size,used,avail,pcent,target \
+        | grep -Ev 'tmpfs|devtmpfs|overlay|/run/'
       register: disk_usage
       ignore_errors: yes
+
 
     - name: Verificar uso de memória
       shell: ". /etc/profile && free -g | awk '/Mem:/ {print $2 \" GB\"}'"
@@ -47,16 +51,11 @@
           ======= DADOS DO SERVIDOR: {{ inventory_hostname }} =======
 
           🐧 Distribuição Linux:{{ linux_version.stdout | default('Não encontrado') }}
-
           🛢️ Versão do MariaDB: {{ mysql_version.stdout | default('Não encontrado') }}
-
           💽 Espaço em disco (todas as partições):
           {{ disk_usage.stdout | default('Não encontrado') }}
 
           🧠 Memória:{{ mem_usage.stdout | default('Não encontrado') }}
-
           ⏱️ Uptime:{{ uptime_info.stdout | default('Não encontrado') }}
-
           🌐 IP do servidor:{{ ip_info.stdout | default('Não encontrado') }}
-
           👥 Usuários conectados:{{ user_count.stdout | default('Não encontrado') }}
