@@ -22,7 +22,7 @@
       ignore_errors: yes
 
     - name: Verificar uso de memória
-      shell: ". /etc/profile && grep MemTotal /proc/meminfo | awk '{print $2 \" \" $3}'"
+      shell: ". /etc/profile && free -g | awk '/Mem:/ {print $2 \" GB\"}'"
       register: mem_usage
       ignore_errors: yes
 
@@ -46,23 +46,17 @@
         msg: |
           ======= DADOS DO SERVIDOR: {{ inventory_hostname }} =======
 
-          🐧 Distribuição Linux:
-          {{ linux_version.stdout | default('Não encontrado') }}
+          🐧 Distribuição Linux:{{ linux_version.stdout | default('Não encontrado') }}
 
-          🛢️ Versão do MariaDB:
-          {{ mysql_version.stdout | default('Não encontrado') }}
+          🛢️ Versão do MariaDB: {{ mysql_version.stdout | default('Não encontrado') }}
 
           💽 Espaço em disco (todas as partições):
           {{ disk_usage.stdout | default('Não encontrado') }}
 
-          🧠 Memória:
-          {{ mem_usage.stdout | default('Não encontrado') }}
+          🧠 Memória:{{ mem_usage.stdout | default('Não encontrado') }}
 
-          ⏱️ Uptime:
-          {{ uptime_info.stdout | default('Não encontrado') }}
+          ⏱️ Uptime:{{ uptime_info.stdout | default('Não encontrado') }}
 
-          🌐 IP do servidor:
-          {{ ip_info.stdout | default('Não encontrado') }}
+          🌐 IP do servidor:{{ ip_info.stdout | default('Não encontrado') }}
 
-          👥 Usuários conectados:
-          {{ user_count.stdout | default('Não encontrado') }}
+          👥 Usuários conectados:{{ user_count.stdout | default('Não encontrado') }}
