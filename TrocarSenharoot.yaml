@@ -1,0 +1,27 @@
+- name: Alterar senha do root com base no nome do host
+  hosts: all
+  become: true
+  gather_facts: no
+
+  tasks:
+    - name: Obter nome do host
+      command: hostname
+      register: hostname_output
+
+    - name: Extrair as 3 primeiras letras em minúsculo
+      set_fact:
+        prefixo_host: "{{ hostname_output.stdout[:3] | lower }}"
+
+    - name: Definir nova senha
+      set_fact:
+        nova_senha: "{{ prefixo_host }}inf2016!."
+
+    - name: Alterar a senha do root
+      user:
+        name: root
+        password: "{{ nova_senha | password_hash('sha512') }}"
+      register: resultado
+
+    - name: Exibir nova senha (para conferência, remova depois!)
+      debug:
+        msg: "Senha do root alterada para: {{ nova_senha }}"
