@@ -4,7 +4,7 @@
   gather_facts: no
 
   vars:
-    usuario_alvo: infoserve
+    usuario_alvo: root
     nova_senha: '@info2016!'
 
   tasks:
