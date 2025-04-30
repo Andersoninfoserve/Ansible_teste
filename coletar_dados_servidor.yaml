@@ -7,7 +7,7 @@
   tasks:
 
     - name: Verificar versão do Linux
-      shell: ". /etc/profile && cat /etc/os-release"
+       shell: ". /etc/profile && grep ^PRETTY_NAME= /etc/os-release | cut -d= -f2- | tr -d '\"'"
       register: linux_version
       ignore_errors: yes
 
